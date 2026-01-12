@@ -13,7 +13,6 @@ permissions:
   contents: read
   packages: write
   actions: write
-  administration: write
 
 jobs:
   sync:
