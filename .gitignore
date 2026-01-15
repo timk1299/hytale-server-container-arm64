@@ -2,6 +2,7 @@
 #Template for AL projects for Dynamics 365 Business Central
 #launch.json folder
 .vscode/
+
 #Cache folder
 .alcache/
 #Symbols folder
@@ -24,3 +25,84 @@ TestResults.xml
 #Hytale specific
 /data
 docker-compose.yml
+
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.sw?
+*.code-workspace
+
+# ----------------------
+# OS-specific files
+# ----------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# ----------------------
+# Python / other language caches (if used)
+# ----------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.pyo
+*.pyd
+
+# ----------------------
+# Docker
+# ----------------------
+**/data/
+*.log
+*.pid
+*.sock
+docker-compose.override.yml
+docker-compose.yml
+.env
+
+# ----------------------
+# Hytale / project-specific
+# ----------------------
+# Ignore all data folders inside examples
+examples/**/data/
+*.jar
+
+# Persistent runtime folders
+/data
+/data_backup
+
+# ----------------------
+# Archives and temp files
+# ----------------------
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.tmp
+*.bak
+
+# ----------------------
+# Build artifacts
+# ----------------------
+dist/
+out/
+*.class
+*.o
+*.so
+*.exe
+
+# ----------------------
+# Misc
+# ----------------------
+*.log
+*.cache

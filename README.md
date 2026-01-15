@@ -1,4 +1,4 @@
-> **[INFO]** This Docker container is functioning properly. Clear your browser cache when visiting the [docs](https://deinfreu.github.io/hytale-server-container/) to ensure you see the latest version of the manual. At the moment, only the Ubuntu image is fully working (:experimental). The Alpine images are next on my list.
+> **[INFO]** This Docker container is functioning properly. Clear your browser cache when visiting the [docs](https://deinfreu.github.io/hytale-server-container/) to ensure you see the latest version of the manual.
 
 <div align="center" width="100%">
 
@@ -7,7 +7,6 @@
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/deinfreu/hytale-server-container/blob/experimental/assets/images/logo_Light.png">
   <img alt="Docker Hytale Server Logo" src="https://github.com/deinfreu/hytale-server-container/blob/experimental/assets/images/logo_Light.png" width="600">
 </picture>
-
 
 [![GitHub stars](https://img.shields.io/github/stars/deinfreu/hytale-server-container?style=for-the-badge&color=daaa3f)](https://github.com/deinfreu/hytale-server-container)
 [![GitHub last commit](https://img.shields.io/github/last-commit/deinfreu/hytale-server-container?style=for-the-badge)](https://github.com/deinfreu/hytale-server-container)
@@ -25,15 +24,16 @@ Deploy a production-ready Hytale server in seconds with automated diagnostics, h
 ## 🤝 Support & Resources
 
 * **Documentation:** Detailed performance optimizations and security specifications are located in the [Project Docs](https://deinfreu.github.io/hytale-server-container/?utm_source=github&utm_medium=social&utm_campaign=github_readme).
-* **Troubleshooting:** Consult the [FAQ](https://deinfreu.github.io/hytale-server-container/faq.html/?utm_source=github&utm_medium=social&utm_campaign=github_readme) and our [Security Policy](SECURITY.md) before reporting issues. You can also visit our [Discord](https://discord.com/invite/2kn2T6zpaV)!
+* **Troubleshooting:** Consult the [FAQ](https://deinfreu.github.io/hytale-server-container/faq.html/?utm_source=github&utm_medium=social&utm_campaign=github_readme) and our [Security Policy](SECURITY.md) before reporting issues. You can also visit our [Discord](https://discord.com/invite/2kn2T6zpaV)
 
 ## ⚡️ Quick start
 
 Install docker [CLI](https://docs.docker.com/engine/install/) on linux or the [GUI](https://docs.docker.com/desktop) on windows, macos and linux
 
 You can run the container by running this in your CLI
+
 ```bash
-docker run -d \
+docker run \
   --name hytale-server \
   -e SERVER_IP="0.0.0.0" \
   -e SERVER_PORT="5520" \
@@ -69,6 +69,5 @@ services:
       - /etc/machine-id:/etc/machine-id:ro
     tty: true
     stdin_open: true
-```
 
 That's all you need to know to start! 🎉

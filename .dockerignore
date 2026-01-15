@@ -20,7 +20,12 @@ docker-compose.yml
 tmp/
 dist/
 .cache/
+<<<<<<< HEAD
 /data
+=======
+**/data
+**/data/**
+>>>>>>> experimental
 
 # OS specific files
 .DS_Store

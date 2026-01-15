@@ -1,7 +1,7 @@
 ---
-name: 🐳 Docker Run Failure
+name: 🐳 Docker Failure
 about: Report issues with running or starting the Docker container
-title: '[DOCKER] Unable to start container'
+title: '[Docker] Unable to start container'
 labels: docker, bug
 assignees: 'deinfreu'
 ---
