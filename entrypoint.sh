@@ -67,6 +67,7 @@ if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
 fi
 
 # --- 2. Initialization ---
+# CRITICAL ORDER: Downloader must run BEFORE config management
 sh "$SCRIPTS_PATH/hytale/hytale_downloader.sh"
 sh "$SCRIPTS_PATH/hytale/hytale_config.sh"
 sh "$SCRIPTS_PATH/hytale/hytale_flags.sh"

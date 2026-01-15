@@ -6,65 +6,74 @@ set -eu
 
 log_section "Hytale Downloader"
 
-# 1. Check if the server is already installed
-log_step "Hytale Server Binary Check"
-
-if [ ! -f "$SERVER_JAR_PATH" ]; then
-    log_warning "HytaleServer.jar not found at $SERVER_JAR_PATH." \
-    "Initializing first-time installation/extraction..."
-
-    # 2. Clean up any old zips and download fresh copy
-    log_step "Download Status"
-    printf "      ${DIM}↳ Info:${NC} Removing old zip files and downloading fresh copy...\n"
+# Helper function to extract and finalize
+extract_server() {
+    local zip_file="$1"
     
-    # Remove any existing zip files to ensure clean state
-    rm -f "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9]*.zip 2>/dev/null || true
-    
-    # Download fresh copy
-    hytale-downloader
-    
-    # Find the newly downloaded zip
-    ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
-    
-    if [ -z "$ZIP_FILE" ]; then
-        log_error "Download failed." "Could not find a valid YYYY.MM*.zip after running downloader."
-        exit 1
-    fi
-    log_success
-
-    # 3. Extract with 7zip
     log_step "Extracting Game Content"
-    printf "      ${DIM}↳ Target:${NC} ${GREEN}%s${NC}\n" "$GAME_DIR"
+    
+    if [ "${DEBUG:-FALSE}" = "TRUE" ]; then
+        printf "      ${DIM}↳ Source:${NC} %s\n" "$(basename "$zip_file")"
+        printf "      ${DIM}↳ Target:${NC} ${GREEN}%s${NC}\n" "$GAME_DIR"
+    fi
     
     # SAFE EXTRACTION: Only overwrites files from the archive
     # Files not in the archive (user data, configs, mods) remain untouched
-    # x: eXtract with full paths (preserves directory structure)
-    # -aoa: Overwrite All - only affects files present in archive
-    # -bsp1: Show progress percentage
-    # -mmt=on: Multi-threaded extraction for performance
-    # -o: Output directory
-    if 7z x "$ZIP_FILE" -aoa -bsp1 -mmt=on -o"$GAME_DIR"; then
+    if 7z x "$zip_file" -aoa -bsp1 -mmt=on -o"$GAME_DIR" >/dev/null 2>&1; then
         log_success
-        printf "      ${DIM}↳ Note:${NC} Only server binaries replaced. User data preserved.\n"
+        if [ "${DEBUG:-FALSE}" = "TRUE" ]; then
+            printf "      ${DIM}↳ Note:${NC} Server binaries updated. User data preserved.\n"
+        fi
     else
         log_error "Extraction failed" "Check disk space or 7z compatibility."
         exit 1
     fi
-
-    # 4. Finalize
+    
     log_step "Post-Extraction Cleanup"
-    rm -f "$ZIP_FILE"
+    rm -f "$zip_file"
     log_success
     
-    chown -R container:container /home/container || log_warning "Chown failed" "User or group may not exist."
-
+    chown -R container:container /home/container 2>/dev/null || true
+    
     log_step "File Permissions"
-    if chmod -R 755 "$GAME_DIR"; then
-        log_success
-    else
-        log_warning "Chmod failed" "Permissions might need manual adjustment."
+    chmod -R 755 "$GAME_DIR" && log_success || log_warning "Chmod failed" "May need manual adjustment."
+}
+
+# Main logic
+log_step "Hytale Server Binary Check"
+
+# Check for existing update package first (manual download or update)
+ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
+
+if [ -n "$ZIP_FILE" ]; then
+    # Update available - extract regardless of jar status
+    log_warning "Update package detected." "Applying server update..."
+    if [ "${DEBUG:-FALSE}" = "TRUE" ]; then
+        printf "      ${DIM}↳ Package:${NC} %s\n" "$(basename "$ZIP_FILE")"
     fi
-else
+    extract_server "$ZIP_FILE"
+elif [ ! -f "$SERVER_JAR_PATH" ]; then
+    # No jar and no zip - fresh install required
+    log_warning "HytaleServer.jar not found." "Downloading fresh installation..."
+    
+    log_step "Download Status"
+    hytale-downloader
+    
+    ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
+    
+    if [ -z "$ZIP_FILE" ]; then
+        log_error "Download failed." "Could not find valid YYYY.MM.DD*.zip after download."
+        exit 1
+    fi
     log_success
-    printf "      ${DIM}↳ Info:${NC} HytaleServer.jar exists. Skipping extraction.\n"
+    
+    extract_server "$ZIP_FILE"
+else
+    # Server already installed, no updates
+    log_success
+    printf "      ${DIM}↳ Info:${NC} Server up-to-date. Skipping extraction.\n"
+fi
+    log_success
+    printf "      ${DIM}↳ Info:${NC} Server up-to-date. Skipping extraction.\n"
+    printf "      ${DIM}↳ Note:${NC} Place YYYY.MM*.zip in data folder to trigger update.\n"
 fi

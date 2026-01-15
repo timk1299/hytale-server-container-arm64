@@ -26,6 +26,17 @@ You can use the following commands:
 | hytale-downloader -patchline pre-release     | Download from pre-release channel                |
 | hytale-downloader -skip-update-check         | Skip automatic update check                      |
 
+### Updating Hytale Server
+
+If you want to automatically update Hytale to the newest version:
+
+1. Enter your container terminal
+2. Run `hytale-downloader` to download the latest version
+3. Restart the container with `docker compose restart`
+4. The server will automatically detect and extract the update
+
+The update process only replaces server binaries - your configs, worlds, and mods are preserved.
+
 ### Hytale server variables
 
 Check the variables in the [docker technical page](./docker.md) which you can use to set server settings 
