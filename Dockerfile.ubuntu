@@ -27,6 +27,10 @@ RUN find scripts -type f -name "*.sh" -exec dos2unix {} + && \
 # --- STAGE 2: Final Runtime ---
 FROM eclipse-temurin:25-jre
 
+# Build arguments for customizable UID/GID
+ARG UID=1000
+ARG GID=1000
+
 # Configuration
 ENV USER=container \
     HOME=/home/container \
@@ -68,7 +72,7 @@ RUN printf "buildtime=${BUILDTIME}\nversion=${VERSION}\nrevision=${REVISION}\n" 
 
 # Final Config
 WORKDIR ${HOME}
-USER root
+USER ${USER}
 EXPOSE ${SERVER_PORT}/udp
 STOPSIGNAL SIGTERM
 

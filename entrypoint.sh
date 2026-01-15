@@ -12,6 +12,8 @@ export BASE_DIR="/home/container"
 export GAME_DIR="$BASE_DIR/game"
 export SERVER_JAR_PATH="$GAME_DIR/Server/HytaleServer.jar"
 export CACHE="${CACHE:-FALSE}"
+export UID="${UID:-1000}"
+export GID="${GID:-1000}"
 
 # --- Hytale specific environment variables ---
 export HYTALE_ACCEPT_EARLY_PLUGINS="${HYTALE_ACCEPT_EARLY_PLUGINS:-FALSE}"
@@ -71,14 +73,21 @@ cd "$BASE_DIR"
 log_success
 
 # --- 4. Execution ---
-printf "\n%s🚀 Launching Hytale Server...%s\n\n" "$BOLD$CYAN" "$NC"
+printf "\n${BOLD}${CYAN}🚀 Launching Hytale Server...${NC}\n\n"
 
-# Choose runtime wrapper depending on availability
-if command -v gosu >/dev/null 2>&1; then
-    RUNTIME="gosu $USER"
-elif command -v su-exec >/dev/null 2>&1; then
-    RUNTIME="su-exec $USER"
+# Determine if we need to switch users
+CURRENT_UID=$(id -u)
+if [ "$CURRENT_UID" = "0" ]; then
+    # Running as root, need to drop privileges
+    if command -v gosu >/dev/null 2>&1; then
+        RUNTIME="gosu $UID:$GID"
+    elif command -v su-exec >/dev/null 2>&1; then
+        RUNTIME="su-exec $UID:$GID"
+    else
+        RUNTIME=""
+    fi
 else
+    # Already running as non-root, no need to switch
     RUNTIME=""
 fi
 
