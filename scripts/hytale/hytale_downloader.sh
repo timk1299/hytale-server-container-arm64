@@ -13,36 +13,39 @@ if [ ! -f "$SERVER_JAR_PATH" ]; then
     log_warning "HytaleServer.jar not found at $SERVER_JAR_PATH." \
     "Initializing first-time installation/extraction..."
 
-    # Find the downloaded zip
-    ZIP_FILE=$(ls "$BASE_DIR"/2026.01*.zip 2>/dev/null | head -n 1)
+    # 2. Clean up any old zips and download fresh copy
+    log_step "Download Status"
+    printf "      ${DIM}↳ Info:${NC} Removing old zip files and downloading fresh copy...\n"
     
-    # 2. Download if the zip is also missing
+    # Remove any existing zip files to ensure clean state
+    rm -f "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9]*.zip 2>/dev/null || true
+    
+    # Download fresh copy
+    hytale-downloader
+    
+    # Find the newly downloaded zip
+    ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
+    
     if [ -z "$ZIP_FILE" ]; then
-        log_step "Download Status"
-        log_warning "No update package found. Running downloader..."
-        hytale-downloader
-        
-        ZIP_FILE=$(ls "$BASE_DIR"/2026.01*.zip 2>/dev/null | head -n 1)
-        
-        if [ -z "$ZIP_FILE" ]; then
-            log_error "Download failed." "Could not find a valid 2026.01*.zip after running downloader."
-            exit 1
-        fi
-        log_success
+        log_error "Download failed." "Could not find a valid YYYY.MM*.zip after running downloader."
+        exit 1
     fi
+    log_success
 
     # 3. Extract with 7zip
     log_step "Extracting Game Content"
-    # Replaced echo -e with printf for POSIX compatibility
     printf "      ${DIM}↳ Target:${NC} ${GREEN}%s${NC}\n" "$GAME_DIR"
     
-    # x: eXtract with full paths
-    # -aoa: Overwrite All existing files
+    # SAFE EXTRACTION: Only overwrites files from the archive
+    # Files not in the archive (user data, configs, mods) remain untouched
+    # x: eXtract with full paths (preserves directory structure)
+    # -aoa: Overwrite All - only affects files present in archive
     # -bsp1: Show progress percentage
-    # -mmt=on: Full multi-core CPU performance
+    # -mmt=on: Multi-threaded extraction for performance
     # -o: Output directory
     if 7z x "$ZIP_FILE" -aoa -bsp1 -mmt=on -o"$GAME_DIR"; then
         log_success
+        printf "      ${DIM}↳ Note:${NC} Only server binaries replaced. User data preserved.\n"
     else
         log_error "Extraction failed" "Check disk space or 7z compatibility."
         exit 1
