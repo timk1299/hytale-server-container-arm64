@@ -32,17 +32,54 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: 🔍 Debug - List files BEFORE build
+        run: |
+          echo "=== Files in assets/website ==="
+          ls -laR assets/website/
+          echo ""
+          echo "=== Files in docs ==="
+          ls -laR docs/
+
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./docs
           destination: ./_site
+
+      - name: 🔍 Debug - List files AFTER Jekyll build
+        run: |
+          echo "=== All files in workspace root ==="
+          ls -la
+          echo ""
+          echo "=== Files in _site directory (recursive) ==="
+          ls -laR ./_site/
+          echo ""
+          echo "=== Count of files in _site ==="
+          find ./_site -type f | wc -l
+          echo ""
+          echo "=== Checking if _site exists ==="
+          [ -d "./_site" ] && echo "_site directory EXISTS" || echo "_site directory MISSING"
           
       - name: Copy static web files
         run: |
-          sudo cp assets/website/robots.txt ./_site/robots.txt
-          sudo cp assets/website/llms.txt ./_site/llms.txt
-          sudo cp assets/website/favicon.ico ./_site/favicon.ico
+          echo "Copying robots.txt..."
+          cp -v assets/website/robots.txt ./_site/robots.txt
+          echo "Copying llms.txt..."
+          cp -v assets/website/llms.txt ./_site/llms.txt
+          echo "Copying favicon.ico..."
+          cp -v assets/website/favicon.ico ./_site/favicon.ico
+          echo "Copy complete!"
+
+      - name: 🔍 Debug - Verify copied files
+        run: |
+          echo "=== Checking if files were copied ==="
+          ls -lh ./_site/robots.txt ./_site/llms.txt ./_site/favicon.ico
+          echo ""
+          echo "=== Content of robots.txt ==="
+          cat ./_site/robots.txt
+          echo ""
+          echo "=== Files in _site root ==="
+          ls -lah ./_site/
 
       - name: Generate Sitemap
         uses: cicirello/generate-sitemap@v1.10.4
@@ -50,6 +87,24 @@ jobs:
           base-url-path: https://deinfreu.github.io/hytale-server-container/
           path-to-root: ./_site
           drop-html-extension: true
+
+      - name: 🔍 Debug - Check sitemap generation
+        run: |
+          echo "=== Looking for sitemap files ==="
+          find ./_site -name "*sitemap*" -o -name "*urlset*"
+          echo ""
+          echo "=== Files in _site root after sitemap ==="
+          ls -lah ./_site/
+          echo ""
+          if [ -f "./_site/sitemap.xml" ]; then
+            echo "=== Sitemap.xml content (first 50 lines) ==="
+            head -n 50 ./_site/sitemap.xml
+          else
+            echo "⚠️ sitemap.xml NOT FOUND"
+          fi
+          echo ""
+          echo "=== Complete file tree of _site ==="
+          tree ./_site/ || find ./_site -type f
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
