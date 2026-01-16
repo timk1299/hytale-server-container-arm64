@@ -63,6 +63,17 @@ export HYTALE_WORLD_GEN="${HYTALE_WORLD_GEN:-}"
 # Load utilities
 . "$SCRIPTS_PATH/utils.sh"
 
+ARCH=$(uname -m)
+if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+    printf "############################################################\n"
+    printf "  WARNING: UNSUPPORTED ARCHITECTURE DETECTED\n"
+    printf "############################################################\n"
+    printf " Architecture: %s\n\n" "$ARCH"
+    printf " Hytale-Downloader only works for x86_64 at the moment.\n"
+    printf " Status: Waiting for Hytale to release the native ARM64 binary.\n"
+    printf "############################################################\n"
+fi
+
 # --- 1. Initialization ---
 # CRITICAL ORDER: Downloader must run BEFORE config management. The audit suite must run AFTER this step.
 sh "$SCRIPTS_PATH/hytale/hytale_downloader.sh"
@@ -83,17 +94,6 @@ if [ "$PROD" = "TRUE" ]; then
     sh "$SCRIPTS_PATH/checks/prod.sh"
 else
     echo -e "${DIM}Production audit skipped (PROD=FALSE)${NC}"
-fi
-
-ARCH=$(uname -m)
-if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-    printf "############################################################\n"
-    printf "  WARNING: UNSUPPORTED ARCHITECTURE DETECTED\n"
-    printf "############################################################\n"
-    printf " Architecture: %s\n\n" "$ARCH"
-    printf " Hytale-Downloader only works for x86_64 at the moment.\n"
-    printf " Status: Waiting for Hytale to release the native ARM64 binary.\n"
-    printf "############################################################\n"
 fi
 
 # --- 3. Startup Preparation ---
