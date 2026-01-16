@@ -63,6 +63,12 @@ export HYTALE_WORLD_GEN="${HYTALE_WORLD_GEN:-}"
 # Load utilities
 . "$SCRIPTS_PATH/utils.sh"
 
+# --- 1. Initialization ---
+# CRITICAL ORDER: Downloader must run BEFORE config management. The audit suite must run AFTER this step.
+sh "$SCRIPTS_PATH/hytale/hytale_downloader.sh"
+sh "$SCRIPTS_PATH/hytale/hytale_config.sh"
+. "$SCRIPTS_PATH/hytale/hytale_options.sh"
+
 # --- 1. Audit Suite ---
 log_section "Audit Suite"
 
@@ -89,12 +95,6 @@ if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
     printf " Status: Waiting for Hytale to release the native ARM64 binary.\n"
     printf "############################################################\n"
 fi
-
-# --- 2. Initialization ---
-# CRITICAL ORDER: Downloader must run BEFORE config management
-sh "$SCRIPTS_PATH/hytale/hytale_downloader.sh"
-sh "$SCRIPTS_PATH/hytale/hytale_config.sh"
-. "$SCRIPTS_PATH/hytale/hytale_options.sh"
 
 # --- 3. Startup Preparation ---
 log_section "Process Execution"
