@@ -21,6 +21,8 @@ export GID="${GID:-1000}"
 export NO_COLOR="${NO_COLOR:-FALSE}"
 
 # --- Hytale specific environment variables ---
+export HYTALE_CACHE="${HYTALE_CACHE:-false}"
+export HYTALE_CACHE_DIR="${HYTALE_CACHE_DIR:-$GAME_DIR/Server/HytaleServer.aot}"
 export HYTALE_ACCEPT_EARLY_PLUGINS="${HYTALE_ACCEPT_EARLY_PLUGINS:-FALSE}"
 export HYTALE_ALLOW_OP="${HYTALE_ALLOW_OP:-FALSE}"
 export HYTALE_AUTH_MODE="${HYTALE_AUTH_MODE:-}"

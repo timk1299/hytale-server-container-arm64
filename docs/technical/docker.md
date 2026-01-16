@@ -29,6 +29,8 @@ Options are listed in the same order as they appear in `java -jar HytaleServer.j
 
 | Variable                          | Description                                                                                                                                                             | Default     |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `HYTALE_CACHE`                    | Enables the Ahead-Of-Time cache                                                                                                                                         | `FALSE`     |
+| `HYTALE_CACHE_DIR`                | Sets the location of the Ahead-Of-Time cache file                                                                                                                       | `./Server/HytaleServer.aot` |
 | `HYTALE_ACCEPT_EARLY_PLUGINS`     | Allow loading early or experimental plugins (unsupported and may cause stability issues)                                                                                | `FALSE`     |
 | `HYTALE_ALLOW_OP`                 | Automatically grant operator permissions                                                                                                                                | `FALSE`     |
 | `HYTALE_AUTH_MODE`                | Authentication mode: `authenticated`, `offline`, or `insecure`. `authenticated` is the built-in default.                                                                | `(Empty)`   |

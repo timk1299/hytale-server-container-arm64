@@ -366,4 +366,13 @@ else
     printf "${DIM}not set${NC}\n"
 fi
 
+# AOT Cache
+log_step "AOT Cache"
+if [ "${HYTALE_CACHE:-}" = "TRUE" ]; then
+    export HYTALE_CACHE_OPT="-XX:AOTCache=$HYTALE_CACHE_DIR"
+    printf "${GREEN}enabled${NC} (dir: ${CYAN}${HYTALE_CACHE_DIR}${NC})\n"
+else
+    printf "${DIM}disabled${NC}\n"
+fi
+
 printf "      ${DIM}↳ Server Options:${NC} ${GREEN}Ready${NC}\n"
