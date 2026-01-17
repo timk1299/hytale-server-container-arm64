@@ -46,32 +46,77 @@ validate_config_json() {
     jq empty "$CONFIG_FILE" >/dev/null 2>&1
 }
 
-# Apply environment variable to JSON config - Args: $1=JSON path, $2=value - Returns: 0 on success, 1 on failure
+# Apply environment variable to JSON config - Args: $1=JSON path, $2=value, $3=type (optional: string|number|boolean) - Returns: 0 on success, 1 on failure
 apply_env() {
     local path="$1"
     local value="$2"
+    local value_type="${3:-auto}"
     local tmp_file="${CONFIG_FILE}${CONFIG_TMP_SUFFIX}"
 
     # Skip if environment variable is not set
     [ -z "$value" ] && return 0
 
-    # Determine value type and apply appropriate jq filter
-    case "$value" in
-        true|false|[0-9]*)
-            # Boolean or numeric value (no quotes)
-            if ! jq "$path = $value" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
-                printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
-                rm -f "$tmp_file"
-                return 1
-            fi
-            ;;
-        *)
-            # String value (wrap in quotes)
+    # Apply value based on explicit or inferred type
+    case "$value_type" in
+        string)
+            # Always treat as string (wrap in quotes)
             if ! jq "$path = \"$value\"" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
                 printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
                 rm -f "$tmp_file"
                 return 1
             fi
+            ;;
+        number)
+            # Always treat as number (no quotes)
+            if ! jq "$path = ($value | tonumber)" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
+                printf "      ${YELLOW}⚠ Failed to apply %s (invalid number)${NC}\n" "$path"
+                rm -f "$tmp_file"
+                return 1
+            fi
+            ;;
+        boolean)
+            # Always treat as boolean (no quotes)
+            case "$value" in
+                true|TRUE|1|yes|YES)
+                    if ! jq "$path = true" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
+                        printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
+                        rm -f "$tmp_file"
+                        return 1
+                    fi
+                    ;;
+                false|FALSE|0|no|NO)
+                    if ! jq "$path = false" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
+                        printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
+                        rm -f "$tmp_file"
+                        return 1
+                    fi
+                    ;;
+                *)
+                    printf "      ${YELLOW}⚠ Invalid boolean value for %s: %s${NC}\n" "$path" "$value"
+                    return 1
+                    ;;
+            esac
+            ;;
+        auto)
+            # Automatic type detection (legacy behavior - less safe)
+            case "$value" in
+                true|false)
+                    # Boolean value
+                    if ! jq "$path = $value" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
+                        printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
+                        rm -f "$tmp_file"
+                        return 1
+                    fi
+                    ;;
+                *)
+                    # Default to string for safety
+                    if ! jq "$path = \"$value\"" "$CONFIG_FILE" > "$tmp_file" 2>/dev/null; then
+                        printf "      ${YELLOW}⚠ Failed to apply %s${NC}\n" "$path"
+                        rm -f "$tmp_file"
+                        return 1
+                    fi
+                    ;;
+            esac
             ;;
     esac
 
@@ -104,14 +149,14 @@ fi
 # Step 2: Apply environment variable overrides and display configuration
 log_step "Applying environment overrides"
 
-apply_env ".ServerName"               "${HYTALE_SERVER_NAME:-}"
-apply_env ".MOTD"                     "${HYTALE_MOTD:-}"
-apply_env ".Password"                 "${HYTALE_PASSWORD:-}"
-apply_env ".MaxPlayers"               "${HYTALE_MAX_PLAYERS:-}"
-apply_env ".MaxViewRadius"            "${HYTALE_MAX_VIEW_RADIUS:-}"
-apply_env ".LocalCompressionEnabled"  "${HYTALE_COMPRESSION:-}"
-apply_env ".Defaults.World"           "${HYTALE_WORLD:-}"
-apply_env ".Defaults.GameMode"        "${HYTALE_GAMEMODE:-}"
+apply_env ".ServerName"               "${HYTALE_SERVER_NAME:-}"       "string"
+apply_env ".MOTD"                     "${HYTALE_MOTD:-}"              "string"
+apply_env ".Password"                 "${HYTALE_PASSWORD:-}"          "string"
+apply_env ".MaxPlayers"               "${HYTALE_MAX_PLAYERS:-}"       "number"
+apply_env ".MaxViewRadius"            "${HYTALE_MAX_VIEW_RADIUS:-}"  "number"
+apply_env ".LocalCompressionEnabled"  "${HYTALE_COMPRESSION:-}"       "boolean"
+apply_env ".Defaults.World"           "${HYTALE_WORLD:-}"             "string"
+apply_env ".Defaults.GameMode"        "${HYTALE_GAMEMODE:-}"          "string"
 
 log_success
 
