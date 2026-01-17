@@ -139,7 +139,7 @@ else
     # Validate existing configuration
     if ! validate_config_json; then
         printf "      ${YELLOW}⚠ Invalid JSON detected. Backing up and recreating...${NC}\n"
-        mv "$CONFIG_FILE" "${CONFIG_FILE}${CONFIG_BACKUP_SUFFIX}"
+        mv -f "$CONFIG_FILE" "${CONFIG_FILE}${CONFIG_BACKUP_SUFFIX}"
         create_default_config
     fi
     
