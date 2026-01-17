@@ -76,7 +76,7 @@ check_filesystem() {
 
     log_step "IO Latency Check"
     # Use a temporary file and don't let a cleanup failure kill the script
-    local test_file="/home/container/.test_io_$(date +%s)"
+    local test_file="${BASE_DIR:-/home/container}/.test_io_$(date +%s)"
     local start=$(date +%s)
     
     # We use '|| true' and silence errors to prevent strict mode from crashing 
@@ -94,7 +94,7 @@ check_filesystem() {
             log_success
         fi
     else
-        log_warning "IO Test Failed." "Could not write to /home/container. Check volume permissions."
+        log_warning "IO Test Failed." "Could not write to ${BASE_DIR:-/home/container}. Check volume permissions."
         # Ensure we try to clean up just in case
         rm -f "$test_file" >/dev/null 2>&1 || true
     fi

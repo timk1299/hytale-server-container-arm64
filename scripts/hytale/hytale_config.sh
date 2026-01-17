@@ -7,7 +7,7 @@ set -eu
 . "$SCRIPTS_PATH/utils.sh"
 
 # Constants
-readonly CONFIG_FILE="/home/container/config.json"
+readonly CONFIG_FILE="${BASE_DIR:-/home/container}/config.json"
 readonly CONFIG_BACKUP_SUFFIX=".invalid.bak"
 readonly CONFIG_TMP_SUFFIX=".tmp"
 

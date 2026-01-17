@@ -33,7 +33,7 @@ extract_server() {
     rm -f "$zip_file"
     log_success
     
-    chown -R container:container /home/container 2>/dev/null || true
+    chown -R container:container "$BASE_DIR" 2>/dev/null || true
     
     log_step "File Permissions"
     chmod -R 755 "$GAME_DIR" && log_success || log_warning "Chmod failed" "May need manual adjustment."
@@ -72,5 +72,5 @@ else
     # Server already installed, no updates
     log_success
     printf "      ${DIM}↳ Info:${NC} Server up-to-date. Skipping extraction.\n"
-    printf "      ${DIM}↳ Note:${NC} Place YYYY.MM.DD*.zip in /home/container to trigger update.\n"
+    printf "      ${DIM}↳ Note:${NC} Place YYYY.MM.DD*.zip in %s to trigger update.\n" "$BASE_DIR"
 fi
