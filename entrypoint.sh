@@ -22,7 +22,8 @@ export GID="${GID:-1000}"
 export NO_COLOR="${NO_COLOR:-FALSE}"
 
 # --- Hytale specific environment variables ---
-export HYTALE_CACHE="${HYTALE_CACHE:-false}"
+export HYTALE_HELP="${HYTALE_HELP:-FA}"
+export HYTALE_CACHE="${HYTALE_CACHE:-FALSE}"
 export HYTALE_CACHE_DIR="${HYTALE_CACHE_DIR:-$GAME_DIR/Server/HytaleServer.aot}"
 export HYTALE_ACCEPT_EARLY_PLUGINS="${HYTALE_ACCEPT_EARLY_PLUGINS:-FALSE}"
 export HYTALE_ALLOW_OP="${HYTALE_ALLOW_OP:-FALSE}"
@@ -62,6 +63,7 @@ export HYTALE_VALIDATE_PREFABS="${HYTALE_VALIDATE_PREFABS:-}"
 export HYTALE_VALIDATE_WORLD_GEN="${HYTALE_VALIDATE_WORLD_GEN:-FALSE}"
 export HYTALE_VERSION="${HYTALE_VERSION:-FALSE}"
 export HYTALE_WORLD_GEN="${HYTALE_WORLD_GEN:-}"
+export RUN_AUTO_AUTH="${RUN_AUTO_AUTH:-TRUE}"
 
 # Load utilities
 . "$SCRIPTS_PATH/utils.sh"
@@ -133,8 +135,6 @@ rm -f "$AUTH_PIPE" "$AUTH_OUTPUT_LOG"
 mkfifo "$AUTH_PIPE"
 touch "$AUTH_OUTPUT_LOG"
 
-RUN_AUTO_AUTH=true
-
 # First check if /etc/machine-id exists
 log_step "Checking Hardware ID"
 if [ ! -f "/etc/machine-id" ]; then
@@ -145,15 +145,15 @@ elif [ -z "$(cat /etc/machine-id 2>/dev/null | tr -d '\n' | tr -d '\r')" ]; then
 elif [ -f "$BASE_DIR/auth.enc" ]; then
     log_success
     log_step "Credential Persistence"
-    printf "${GREEN}enabled (auto-auth disabled)${NC}\n"
-    RUN_AUTO_AUTH=false
+    printf "${GREEN}enabled (auth.enc file found)${NC}\n"
+    RUN_AUTO_AUTH=FALSE
 else
     log_success
     log_step "Credential Persistence"
     printf "${YELLOW}not configured${NC}\n"
 fi
 
-if [ "$RUN_AUTO_AUTH" = "true" ]; then
+if [ "$RUN_AUTO_AUTH" = "TRUE" ]; then
     (
         tail -n0 -F "$AUTH_OUTPUT_LOG" | while IFS= read -r line; do
             case "$line" in
@@ -177,6 +177,7 @@ exec $RUNTIME sh -c "cat \"$AUTH_PIPE\" - | exec stdbuf -oL -eL java $JAVA_ARGS 
     -Dterminal.jline=false \
     -Dterminal.ansi=true \
     -jar \"$SERVER_JAR_PATH\" \
+    $HYTALE_HELP_OPT \
     $HYTALE_ACCEPT_EARLY_PLUGINS_OPT \
     $HYTALE_ALLOW_OP_OPT \
     $HYTALE_AUTH_MODE_OPT \
