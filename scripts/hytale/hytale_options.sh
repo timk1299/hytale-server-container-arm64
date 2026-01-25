@@ -7,6 +7,7 @@ set -eu
 log_section "Server Options Management"
 
 # Initialize options to ensure they are empty if not set
+export HYTALE_HELP_OPT=""
 export HYTALE_ACCEPT_EARLY_PLUGINS_OPT=""
 export HYTALE_ALLOW_OP_OPT=""
 export HYTALE_AUTH_MODE_OPT=""
