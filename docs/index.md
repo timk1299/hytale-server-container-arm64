@@ -47,11 +47,11 @@ If you run into trouble, we have resources available:
 
 ## About the project
 
-Just the Docs is &copy; 2025-{{ "now" | date: "%Y" }} by [Deinfreu](https://github.com/deinfreu) and the [Hytale Server Container contributors](https://github.com/deinfreu/hytale-server-container/graphs/contributors).
+Hytale Server Container &copy; 2025-{{ "now" | date: "%Y" }} by [Deinfreu](https://github.com/deinfreu) and the [Hytale Server Container contributors](https://github.com/deinfreu/hytale-server-container/graphs/contributors).
 
 ### License
 
-Just the Docs is distributed by an [APACHE-2.0](https://github.com/deinfreu/hytale-server-container/blob/main/LICENSE)license.
+Hytale Server Container is distributed under the [APACHE-2.0](https://github.com/deinfreu/hytale-server-container/blob/main/LICENSE) license.
 
 ### Contributing
 
