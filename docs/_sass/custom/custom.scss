@@ -43,3 +43,23 @@
     font-size: 1rem !important;
     font-weight: 700 !important
 }
+
+/* Color */
+
+.side-bar {
+    background-color: oklch(12.9% 0.042 264.695) !important
+}
+
+body {
+    background-color: oklch(12.9% 0.042 264.695) !important
+}
+
+.main-header {
+    background-color: oklch(12.9% 0.042 264.695) !important
+}
+
+.search-input {
+    background-color: oklch(12.9% 0.042 264.695) !important;
+    border-color: oklch(18% 0.05 264.695) !important;
+    color: oklch(90% 0.02 264.695) !important
+}
