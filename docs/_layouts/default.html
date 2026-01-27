@@ -71,7 +71,7 @@ layout: table_wrappers
   }
 
   function syncSidebar() {
-    const currentPath = window.location.pathname.replace(/\/$/, ""); // Path without trailing slash
+    const currentPath = window.location.pathname.replace(/\/$/, "");
     const homePath = "/hytale-server-container";
 
     document.querySelectorAll('.nav-list-item').forEach((item, index) => {
@@ -79,25 +79,26 @@ layout: table_wrappers
       if (!link) return;
 
       let linkPath = link.getAttribute('href') ? link.getAttribute('href').replace(/\/$/, "") : "";
+      const linkText = link.innerText.toLowerCase();
 
-      if (index === 0 && (!linkPath || linkPath === homePath)) {
-        linkPath = homePath;
-      }
-
+      // Reset state
       link.classList.remove('active');
       link.style.fontWeight = "400";
       link.style.color = "";
       item.classList.remove('active');
 
-      const isHomeMatch = (currentPath === homePath || currentPath === homePath + "/index.html") && linkPath === homePath;
+      // Logic for Home and missing HREFs (like Roadmap)
+      const isHome = (currentPath === homePath || currentPath === homePath + "/index.html") && (index === 0 || linkText.includes("home"));
+      const isRoadmap = currentPath.includes("roadmap") && linkText.includes("roadmap");
       const isPathMatch = linkPath !== "" && linkPath === currentPath;
 
-      if (isHomeMatch || isPathMatch) {
+      if (isHome || isRoadmap || isPathMatch) {
         link.classList.add('active');
         link.style.fontWeight = "600";
         link.style.color = "#4593fb";
         item.classList.add('active');
 
+        // Keep parent menus open
         let parent = item;
         while (parent) {
           if (parent.classList.contains('nav-list-item')) {
@@ -117,8 +118,14 @@ layout: table_wrappers
       item.style.cursor = 'pointer';
       item.onclick = (e) => {
         const link = item.querySelector('.nav-list-link');
-        if (link && e.target !== link && !e.target.closest('.nav-list-expander')) {
-          link.click();
+        // Prevent trigger if clicking the expander button specifically
+        if (link && !e.target.closest('.nav-list-expander')) {
+          const href = link.getAttribute('href');
+          if (href) {
+            swup.navigate(href);
+          } else if (e.target !== link) {
+            link.click();
+          }
         }
       };
     });
