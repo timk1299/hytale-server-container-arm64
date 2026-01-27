@@ -71,14 +71,14 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Define the duration and timing */
-.swup-transition-fade {
-  transition: 0.4s;
+/* This targets the specific content area */
+#main-content {
+  transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
   opacity: 1;
 }
 
-/* Define the state when the page is being replaced */
-html.is-animating .swup-transition-fade {
+/* The state during the swap */
+html.is-animating #main-content {
   opacity: 0;
   transform: translateY(10px);
 }

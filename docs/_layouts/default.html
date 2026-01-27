@@ -52,17 +52,33 @@ layout: table_wrappers
 <script src="https://unpkg.com/swup@4"></script>
 
 <script>
-  const swup = new Swup();
+  const swup = new Swup({
+    containers: ["#main-content"] // Targeting your specific ID
+  });
 
-  // Important for Jekyll: Re-run your theme's JS after swup replaces content
-  swup.hooks.on('page:view', () => {
-    // If 'just-the-docs.js' needs to re-initialize the menu or search:
+  function reinitJustTheDocs() {
+    // 1. Re-initialize the theme logic (Search, Mobile Nav)
     if (typeof jtd !== 'undefined') {
-      // This is a placeholder; Just the Docs sometimes needs 
-      // specific functions re-called here to keep the sidebar working.
+        // Just the Docs doesn't always have a public 'init' method depending on the version,
+        // so we re-run the core initialization if it's available.
+        if (jtd.init) jtd.init();
     }
 
-    // Smooth scroll to top on new page
+    // 2. Fix Anchor Links: Just the Docs uses custom code for those clickable headers
+    // Re-running this ensures the SVGs and links in headers function.
+    if (window.initSearch) window.initSearch();
+
+    // 3. Accessibility: Move focus to the top of the new content
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.setAttribute('tabindex', '-1');
+        mainContent.focus();
+    }
+  }
+
+  // Run the fix every time a new page is loaded via Swup
+  swup.hooks.on('page:view', () => {
+    reinitJustTheDocs();
     window.scrollTo(0, 0);
   });
 </script>
