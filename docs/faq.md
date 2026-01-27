@@ -11,23 +11,23 @@ Find solutions to common issues encountered when setting up or managing your Hyt
 
 ---
 
-## How can I update the hytale server files to the latest version?
+## How can I update the Hytale server to the latest version?
 
 {: .warning }
 > Create a backup of your server files before performing an update to prevent data loss.
 
-1. You first need to download the latest server files using the `hytale-downloader` tool. You can do this by running the following command inside your container:
+1. Run the following command to access the terminal inside your container:
 
 ```bash
 docker exec -it hytale-server /bin/sh
 ```
 
-2. then run the hytale-downloader cli tool:
+2. Run the `hytale-downloader` CLI tool:
 ```bash
 hytale-downloader
 ```
 
-3. Now restart the docker container and the script will automatically install the new files.
+3. Restart the Docker container, and the script will automatically install the new files.
 
 ---
 
@@ -42,7 +42,7 @@ You can attach to the server console using the following command:
 docker attach CONTAINER_NAME
 ```
 
-once attached, you can use the following command to give yourself operator status:
+Once attached, use the following command to give yourself operator status:
 
 ```bash
 /op add USERNAME
@@ -55,22 +55,22 @@ once attached, you can use the following command to give yourself operator statu
 This happens because the container does not have access to the host’s Linux hardware ID. Without it, the server generates a new identity on each restart.
 
 ### How to fix
-In your docker compose mount this volume: "/etc/machine-id:/etc/machine-id:ro". Or in docker run use -v "/etc/machine-id:/etc/machine-id:ro".
+Mount the machine-id volume in your Docker Compose file: `"/etc/machine-id:/etc/machine-id:ro"`. For Docker run, use `-v "/etc/machine-id:/etc/machine-id:ro"`.
 
 ---
 
 ## I can't run the server on ARM64
 
-This happens because the 'hytale-downloader' cli tool does not yet support arm64
+The `hytale-downloader` CLI tool does not yet support ARM64.
 
 ### How to fix
-Currently waiting for hytale to release the ARM64 version for this tool. See the tweet [here](https://x.com/slikey/status/2010869532454510999)
+Currently waiting for Hytale to release the ARM64 version of this tool. See the announcement [here](https://x.com/slikey/status/2010869532454510999).
 
 ---
 
-## 🕒 My logs don't show the correct date or time.
+## My logs don't show the correct date or time
 
-By default, Docker containers often run in Coordinated Universal Time (UTC). To synchronize the server logs with your local time, you must define the `TZ` (Time Zone) environment variable.
+By default, Docker containers run in Coordinated Universal Time (UTC). To synchronize the server logs with your local time, define the `TZ` (Time Zone) environment variable.
 
 ### How to Fix
 1.  Consult the [List of TZ Database Time Zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
