@@ -71,14 +71,15 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Target the main container */
-#top {
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
+/* 1. Define the transition on the container */
+#main-content {
+  transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+  will-change: opacity, transform;
   opacity: 1;
 }
 
-/* State when the page is changing */
-html.is-animating #top {
+/* 2. Define the 'out' state */
+html.is-animating #main-content {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
 }

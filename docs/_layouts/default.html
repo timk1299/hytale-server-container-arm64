@@ -50,13 +50,12 @@ layout: table_wrappers
 </body>
 
 <script src="https://unpkg.com/swup@4"></script>
-
 <script>
   const swup = new Swup({
-    containers: ["#top"]
+    containers: ["#main-content"]
   });
 
-  function reinitTheme() {
+  function reinitJustTheDocs() {
     if (window.jtd && jtd.init) {
       jtd.init();
     }
@@ -65,12 +64,21 @@ layout: table_wrappers
       window.initSearch();
     }
 
-    document.body.classList.remove('nav-open');
+    const content = document.getElementById('main-content');
+    if (content) {
+      content.setAttribute('tabindex', '-1');
+      content.focus();
+    }
   }
 
   swup.hooks.on('page:view', () => {
-    reinitTheme();
+    reinitJustTheDocs();
+    
     window.scrollTo(0, 0);
+  });
+
+  swup.hooks.on('click:link', () => {
+    document.body.classList.remove('nav-open');
   });
 </script>
 
