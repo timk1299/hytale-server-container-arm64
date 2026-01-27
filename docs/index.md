@@ -6,7 +6,7 @@ description: "Hytale Docker Server Documentation Home"
 permalink: /
 ---
 
-# 🐳 Hytale Docker Server
+# Hytale Docker Server
 
 Welcome to the official documentation for the **`deinfreu/hytale-server`**. This project provides a high-performance, containerized environment for hosting Hytale servers with ease, featuring automated binary management cross-platform and Pterodactyl support.
 
@@ -14,18 +14,18 @@ To get the most performance out of your server, I suggest taking a look at the [
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-* **🚀 Fast server startup:** Startup your server in 7 seconds with `CACHE=TRUE`
+* **Fast server startup:** Startup your server in 7 seconds with `CACHE=TRUE`
 * **⚡ Easy Deployment:** Go to the installation pages to get started
-* **🤖 Smart CLI:** Includes the `hytale-downloader` tool to manage server binaries and check for updates automatically. You can just use "hytale-downloader" in the terminal to access it.
-* **🍓 Multi-Arch Support:** Optimized for `x86_64` (`ARM64` coming soon [more info](https://x.com/slikey/status/2010869532454510999)).
-* **🛠️ Diagnostic Suite:** Built-in debug mode to audit your network and security settings automatically.
-* **📉 Slim Images:** Optimized, lightweight image variants for production environments.
+* **Smart CLI:** Includes the `hytale-downloader` tool to manage server binaries and check for updates automatically. You can just use "hytale-downloader" in the terminal to access it.
+* **Multi-Arch Support:** Optimized for `x86_64` (`ARM64` coming soon [more info](https://x.com/slikey/status/2010869532454510999)).
+* **Diagnostic Suite:** Built-in debug mode to audit your network and security settings automatically.
+* **Slim Images:** Optimized, lightweight image variants for production environments.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Ready to host your world? Follow our step-by-step guides to get started:
 
@@ -39,7 +39,7 @@ Ready to host your world? Follow our step-by-step guides to get started:
 
 ---
 
-## 🆘 Need Help?
+## Need Help?
 
 If you run into trouble, we have resources available:
 
