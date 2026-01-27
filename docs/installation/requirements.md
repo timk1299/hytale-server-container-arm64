@@ -31,4 +31,6 @@ The Docker image is built for 64-bit environments. 32-bit systems are not suppor
 #### 4. Other
 * Storage Requirement: Minimum 6GB free space required for hytale server installation.
 
+---
+
 **Go to the [Next page](./container_installation.md)!**

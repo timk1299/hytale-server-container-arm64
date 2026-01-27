@@ -24,4 +24,6 @@ We are now going to start the server!
 
 > Info: If you want to run commands in the hytale server directly from the console. You can use `docker attach CONTAINER_NAME` to attach to the server console. 
 
+---
+
 **Go to the [Debug page](./debug.md) or the [Support page](./support.md) if you need help!
