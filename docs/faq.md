@@ -25,6 +25,8 @@ once attached, you can use the following command to give yourself operator statu
 /op add USERNAME
 ```
 
+---
+
 ## Server requires re-authentication after every restart
 
 This happens because the container does not have access to the host’s Linux hardware ID. Without it, the server generates a new identity on each restart.
