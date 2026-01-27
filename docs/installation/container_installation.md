@@ -23,7 +23,7 @@ docker run \
   -v "hytale-server:/home/container" \
   -v "/etc/machine-id:/etc/machine-id:ro" \
   --restart unless-stopped \
-  deinfreu/hytale-server:experimental
+  deinfreu/hytale-server:latest
 ```
 
 ---
@@ -45,7 +45,7 @@ docker run \
     ```yaml
     services:
       hytale:
-        image: deinfreu/hytale-server:experimental
+        image: deinfreu/hytale-server:latest
         container_name: hytale-server
         environment:
           SERVER_IP: "0.0.0.0"
