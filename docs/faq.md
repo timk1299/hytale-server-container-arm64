@@ -35,6 +35,9 @@ Now restart the docker container and the script will automatically install the n
 
 You can attach to the server console using the following command:
 
+{: .note }
+> Enable interactive mode by setting `tty: true` and `stdin_open: true` in your docker compose file, or use `docker run -it` for interactive access.
+
 ```bash
 docker attach CONTAINER_NAME
 ```
