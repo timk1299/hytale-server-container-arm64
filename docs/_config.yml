@@ -2,9 +2,9 @@
 title: Hytale Server Cotnainer
 description: A lightweight Dockerized environment for Hytale servers.
 theme: jekyll-remote-theme
-
 favicon_ico: "favicon.ico"
 
+# Google Analytics settings
 ga_tracking: G-L109Y1GVHR
 ga_tracking_anonymize_ip: true # Use GDPR compliant Google Analytics settings (true/nil by default)
 
@@ -24,3 +24,18 @@ aux_links:
     - "https://github.com/deinfreu/hytale-server-container"
   "Docker Hub":
     - "https://hub.docker.com/r/deinfreu/hytale-server" # Update if different
+
+# Custoimization settings
+callouts:
+  warning:
+    title: Warning
+    color: red
+  info:
+    title: Info
+    color: blue
+  tip:
+    title: Tip
+    color: purple
+  note:
+    title: Note
+    color: purple 
