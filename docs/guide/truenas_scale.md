@@ -1,0 +1,8 @@
+---
+layout: default
+title: "Truenas Scale"
+parent: "📓 guide"
+nav_order: 1
+---
+
+More info coming soon...
