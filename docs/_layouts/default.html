@@ -50,7 +50,6 @@ layout: table_wrappers
 </body>
 
 <script src="https://unpkg.com/swup@4"></script>
-<script src="https://unpkg.com/swup@4"></script>
 <script>
   const swup = new Swup({
     containers: ["#main-content"],
@@ -72,38 +71,38 @@ layout: table_wrappers
   }
 
   function syncSidebar() {
-    const currentPath = window.location.pathname;
-    const homePaths = ['/hytale-server-container/', '/hytale-server-container/index.html'];
+    const currentPath = window.location.pathname.replace(/\/$/, ""); // Path without trailing slash
+    const homePath = "/hytale-server-container";
 
-    document.querySelectorAll('.nav-list-link').forEach((link, index) => {
-      let linkPath = link.getAttribute('href');
-      
-      // Fix for the Home link missing href or being the first element
-      if (!linkPath && index === 0) {
-        linkPath = '/hytale-server-container/';
+    document.querySelectorAll('.nav-list-item').forEach((item, index) => {
+      const link = item.querySelector('.nav-list-link');
+      if (!link) return;
+
+      let linkPath = link.getAttribute('href') ? link.getAttribute('href').replace(/\/$/, "") : "";
+
+      if (index === 0 && (!linkPath || linkPath === homePath)) {
+        linkPath = homePath;
       }
 
       link.classList.remove('active');
       link.style.fontWeight = "400";
       link.style.color = "";
-      
-      const parentLi = link.closest('.nav-list-item');
-      if (parentLi) parentLi.classList.remove('active');
+      item.classList.remove('active');
 
-      const isHome = homePaths.includes(currentPath) && (linkPath === '/hytale-server-container/' || index === 0);
-      const isMatch = linkPath === currentPath || linkPath === currentPath + '/';
+      const isHomeMatch = (currentPath === homePath || currentPath === homePath + "/index.html") && linkPath === homePath;
+      const isPathMatch = linkPath !== "" && linkPath === currentPath;
 
-      if (isHome || isMatch) {
+      if (isHomeMatch || isPathMatch) {
         link.classList.add('active');
         link.style.fontWeight = "600";
         link.style.color = "#4593fb";
-        if (parentLi) parentLi.classList.add('active');
+        item.classList.add('active');
 
-        let parent = link.closest('.nav-list-item');
+        let parent = item;
         while (parent) {
-          const expander = parent.querySelector('.nav-list-expander');
-          if (expander) {
-            expander.setAttribute('aria-expanded', 'true');
+          if (parent.classList.contains('nav-list-item')) {
+            const expander = parent.querySelector('.nav-list-expander');
+            if (expander) expander.setAttribute('aria-expanded', 'true');
             const subList = parent.querySelector('.nav-list');
             if (subList) subList.style.display = 'block';
           }
@@ -113,9 +112,22 @@ layout: table_wrappers
     });
   }
 
+  function makeNavItemsClickable() {
+    document.querySelectorAll('.nav-list-item').forEach(item => {
+      item.style.cursor = 'pointer';
+      item.onclick = (e) => {
+        const link = item.querySelector('.nav-list-link');
+        if (link && e.target !== link && !e.target.closest('.nav-list-expander')) {
+          link.click();
+        }
+      };
+    });
+  }
+
   swup.hooks.on('page:view', () => {
     reinitJustTheDocs();
     syncSidebar();
+    makeNavItemsClickable();
     window.scrollTo(0, 0);
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
@@ -124,7 +136,10 @@ layout: table_wrappers
     }
   });
 
-  document.addEventListener('DOMContentLoaded', syncSidebar);
+  document.addEventListener('DOMContentLoaded', () => {
+    syncSidebar();
+    makeNavItemsClickable();
+  });
 </script>
 
 </html>
