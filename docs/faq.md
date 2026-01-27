@@ -22,12 +22,12 @@ Find solutions to common issues encountered when setting up or managing your Hyt
 docker exec -it hytale-server /bin/sh
 ```
 
-then run the hytale-downloader cli tool:
+2. then run the hytale-downloader cli tool:
 ```bash
 hytale-downloader
 ```
 
-Now restart the docker container and the script will automatically install the new files.
+3. Now restart the docker container and the script will automatically install the new files.
 
 ---
 
