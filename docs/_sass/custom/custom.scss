@@ -63,3 +63,7 @@ body {
     border-color: oklch(18% 0.05 264.695) !important;
     color: oklch(90% 0.02 264.695) !important
 }
+
+html {
+    scrollbar-gutter: stable;
+}
