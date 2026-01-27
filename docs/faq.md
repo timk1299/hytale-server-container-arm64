@@ -11,6 +11,26 @@ Find solutions to common issues encountered when setting up or managing your Hyt
 
 ---
 
+## How can I update the hytale server files to the latest version?
+
+{: .warning }
+> Create a backup of your server files before performing an update to prevent data loss.
+
+1. You first need to download the latest server files using the `hytale-downloader` tool. You can do this by running the following command inside your container:
+
+```bash
+docker exec -it hytale-server /bin/sh
+```
+
+then run the hytale-downloader cli tool:
+```bash
+hytale-downloader
+```
+
+Now restart the docker container and the script will automatically install the new files.
+
+---
+
 ## How can I give myself permissions in-game?
 
 You can attach to the server console using the following command:
