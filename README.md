@@ -13,7 +13,7 @@
 [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/deinfreu/hytale-server/latest-alpine-liberica?sort=date&style=for-the-badge&label=ALPINE%20LIBERICA%20SIZE)](https://hub.docker.com/layers/deinfreu/hytale-server/latest-alpine-liberica/images/)
 [![GitHub license](https://img.shields.io/github/license/deinfreu/hytale-server-container?style=for-the-badge)](https://github.com/deinfreu/hytale-server-container/blob/main/LICENSE)
 
-Deploy a stable Hytale dedicated server with a community-focused Docker image maintained by 10+ contributors. This project simplifies Hytale self-hosting by combining optimized networking with built-in security and debugging tools. Join our active Discord for direct support and to connect with other server owners. Whether you're testing mods or running a persistent world, this container provides a consistent, production-ready environment in one command.
+Deploy a Hytale dedicated server with a community-focused Docker image by 10+ contributors. This project simplifies Hytale self-hosting with built-in security, networking and debugging tools. Join our active Discord for direct support and to connect with other server owners. Whether you're testing mods or running a persistent world, this container provides a consistent, production-ready environment in one command.
 
 </div>
 
