@@ -37,7 +37,7 @@ if [ "$RUN_AUTO_AUTH" = "TRUE" ]; then
     (
         tail -n0 -F "$AUTH_OUTPUT_LOG" | while IFS= read -r line; do
             case "$line" in
-                *"$HYTALE_AUTH_READY_PATTERN"*|*"$HYTALE_AUTH_READY_ALT_PATTERN"*|*"No server tokens configured"*)
+                *"$HYTALE_AUTH_READY_PATTERN"*|*"$HYTALE_AUTH_READY_ALT_PATTERN"*)
                     {
                         printf "auth persistence Encrypted\n"
                         printf "auth login device\n"
