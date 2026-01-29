@@ -20,7 +20,7 @@ Deploy a Hytale dedicated server with a community-focused Docker image by 10+ co
 ## Support & Resources
 
 * **Documentation:** Detailed performance optimizations and security specifications are located in the [Project Docs](https://hytale-server-container.com/?utm_source=dockerhub&utm_medium=social&utm_campaign=dockerhub_readme).
-* **Troubleshooting:** Check the [support](https://hytale-server-container.com/installation/support//?utm_source=dockerhub&utm_medium=social&utm_campaign=dockerhub_readme) page and our [Security Policy](SECURITY.md) before reporting issues. You can also visit our [Discord](https://discord.com/invite/2kn2T6zpaV)
+* **Troubleshooting:** Check the [support](https://hytale-server-container.com/installation/support/?utm_source=dockerhub&utm_medium=social&utm_campaign=dockerhub_readme) page and our [Security Policy](SECURITY.md) before reporting issues. You can also visit our [Discord](https://discord.com/invite/2kn2T6zpaV)
 
 ## Quick start
 
