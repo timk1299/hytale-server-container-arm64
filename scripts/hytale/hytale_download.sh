@@ -43,7 +43,7 @@ extract_server() {
 log_warning "HytaleServer.jar not found." "Downloading fresh installation..."
 
 log_step "Download Status"
-box64 hytale-downloader
+hytale-downloader
 
 ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
 
