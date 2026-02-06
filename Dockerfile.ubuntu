@@ -110,7 +110,7 @@ WORKDIR /build
 
 # 1. Install Runtime Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    tini curl iproute2 ca-certificates tzdata jq p7zip-full wget \
+    tini curl iproute2 ca-certificates tzdata jq unzip wget \
     squashfs-tools &&\
     rm -rf /var/lib/apt/lists/*
 
@@ -160,6 +160,7 @@ WORKDIR /home/${USER}/.fex-emu
 RUN echo '{"Config":{"RootFS":"Ubuntu_24_04","Env": "GODEBUG=asyncpreemptoff=1"}}' > ./Config.json
 
 # Final Config
+RUN mkdir ${HOME}/temp
 WORKDIR ${HOME}/hytale
 USER ${USER}
 EXPOSE ${SERVER_PORT}/udp

@@ -13,6 +13,8 @@
 [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/deinfreu/hytale-server/latest-alpine-liberica?sort=date&style=for-the-badge&label=ALPINE%20LIBERICA%20SIZE)](https://hub.docker.com/layers/deinfreu/hytale-server/latest-alpine-liberica/images/)
 [![GitHub license](https://img.shields.io/github/license/deinfreu/hytale-server-container?style=for-the-badge)](https://github.com/deinfreu/hytale-server-container/blob/main/LICENSE)
 
+**This repository is based on https://github.com/deinfreu/hytale-server-container.git, but is executable on arm64.**
+
 Deploy a Hytale dedicated server with a community-focused Docker image by 10+ contributors. This project simplifies Hytale self-hosting with built-in security, networking and debugging tools. Join our active Discord for direct support and to connect with other server owners. Whether you're testing mods or running a persistent world, this container provides a consistent, production-ready environment in one command.
 
 </div>
@@ -37,18 +39,18 @@ docker run \
   -e DEBUG="FALSE" \
   -e TZ="Europe/Amsterdam" \
   -p 5520:5520/udp \
-  -v "hytale-server:/home/container" \
+  -v "hytale-server:/home/container/hytale" \
   -v "/etc/machine-id:/etc/machine-id:ro" \
   --restart unless-stopped \
-  deinfreu/hytale-server:latest
+  timk1299/hytale-server:latest
 ```
 
-Alternatively, you can deploy using Docker Compose. Use the configuration below or explore the [examples](https://github.com/deinfreu/hytale-server-container/tree/main/examples) folder for more advanced templates.
+Alternatively, you can deploy using Docker Compose. Use the configuration below or explore the [examples](https://github.com/timk1299/hytale-server-container/tree/main/examples) folder for more advanced templates.
 
 ```bash
 services:
   hytale:
-    image: deinfreu/hytale-server:latest
+    image: timk1299/hytale-server:latest
     container_name: hytale-server
     environment:
       SERVER_IP: "0.0.0.0"
@@ -60,7 +62,7 @@ services:
     ports:
       - "5520:5520/udp"
     volumes:
-      - ./data:/home/container
+      - ./data:/home/container/hytale
       - /etc/machine-id:/etc/machine-id:ro
     tty: true
     stdin_open: true

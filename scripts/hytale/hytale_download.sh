@@ -19,7 +19,8 @@ extract_server() {
     
     # SAFE EXTRACTION: Only overwrites files from the archive
     # Files not in the archive (user data, configs, mods) remain untouched
-    if 7z x "$zip_file" -aoa -bsp1 -mmt=on -o"$GAME_DIR" >/dev/null 2>&1; then
+#    if 7z x "$zip_file" -aoa -bsp1 -mmt=on -o"$GAME_DIR"; then # >/dev/null 2>&1; then
+    if unzip "$zip_file" -d "$GAME_DIR"; then
         log_success
         if [ "${DEBUG:-FALSE}" = "TRUE" ]; then
             printf "      ${DIM}↳ Note:${NC} Server binaries updated. User data preserved.\n"
@@ -43,10 +44,9 @@ extract_server() {
 log_warning "HytaleServer.jar not found." "Downloading fresh installation..."
 
 log_step "Download Status"
-FEX /usr/local/bin/hytale-downloader
+(cd "$TEMP_DIR" ; FEX /usr/local/bin/hytale-downloader)
 
-ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
-
+ZIP_FILE=$(find "$TEMP_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
 if [ -z "$ZIP_FILE" ]; then
     log_error "Download failed." "Could not find valid YYYY.MM.DD*.zip after download."
     exit 1
