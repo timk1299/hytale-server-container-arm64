@@ -87,17 +87,10 @@ layout: table_wrappers
           const currentTheme = darkModeQuery.matches ? 'dark' : 'light';
           document.documentElement.setAttribute('data-theme', currentTheme);
 
-          try {
-            if (window.jtd && typeof window.jtd.setTheme === 'function') {
-              window.jtd.setTheme(currentTheme);
-            }
-          } catch (e) {}
-
           requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              document.documentElement.classList.remove('loading');
-              document.documentElement.classList.add('loaded');
-            });
+            document.documentElement.classList.remove('loading');
+            document.documentElement.classList.add('loaded');
+
           });
         }
 
