@@ -2,97 +2,74 @@
 layout: table_wrappers
 ---
 <!doctype html>
-
 <html lang="{{ site.lang | default: 'en-US' }}">
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (systemDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.classList.add('loading');
+    })();
+  </script>
+
   <style>
+    html {
+      scrollbar-gutter: stable;
+    }
     :root {
       background-color: #f8fafc;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        background-color: #020617;
-      }
+    [data-theme='dark'] {
+      background-color: #020617;
     }
-
     #preloader {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       z-index: 10000;
-      visibility: visible;
-      opacity: 1;
-      transition: opacity 0.25s ease-out;
+      background-color: #f8fafc;
+      transition: opacity 0.4s ease-out, visibility 0.4s;
     }
-
-    html.loading {
-      overflow: hidden;
+    [data-theme='dark'] #preloader {
+      background-color: #020617;
     }
-    html.loaded #preloader {
+    .loaded #preloader {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
-
-    @media (prefers-color-scheme: dark) {
-      #preloader {
-        background-color: #020617;
-      }
-    }
-    @media (prefers-color-scheme: light) {
-      #preloader {
-        background-color: #f8fafc;
-      }
-    }
   </style>
-
-  <script>
-    (function () {
-      document.documentElement.classList.add('loading');
-      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const theme = darkModeQuery.matches ? 'dark' : 'light';
-
-      const loader = document.createElement('div');
-      loader.id = 'preloader';
-      loader.style.backgroundColor = theme === 'dark' ? '#020617' : '#f8fafc';
-
-      const observer = new MutationObserver(function (mutations, obs) {
-        if (document.body) {
-          document.body.appendChild(loader);
-          obs.disconnect();
-        }
-      });
-      observer.observe(document.documentElement, { childList: true });
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
 
   {% include head.html %}
 
   <body>
+    <div id="preloader"></div>
+
     <a class="skip-to-main" href="#main-content">Skip to main content</a>
+
     {% include icons/icons.html %}
+
     {% if page.nav_enabled == true %}
       {% include components/sidebar.html %}
-    {% elsif layout.nav_enabled == true and page.nav_enabled == null %}
+    {% elsif layout.nav_enabled == true and page.nav_enabled == nil %}
       {% include components/sidebar.html %}
-    {% elsif site.nav_enabled != false and layout.nav_enabled == null and page.nav_enabled == null %}
+    {% elsif site.nav_enabled != false and layout.nav_enabled == nil and page.nav_enabled == nil %}
       {% include components/sidebar.html %}
     {% endif %}
+
     <div class="main" id="top">
       {% include components/header.html %}
+
       <div class="main-content-wrap">
         {% include components/breadcrumbs.html %}
+
         <div id="main-content" class="main-content">
           <main>
             {% if site.heading_anchors != false %}
-              {%
-                include vendor/anchor_headings.html html=content beforeHeading="true" anchorBody="<svg
-                viewBox=\"0 0 16 16\" aria-hidden=\"true\">
-                <use xlink:href=\"#svg-link\"></use>
-                </svg>" anchorClass="anchor-heading" anchorAttrs="aria-labelledby=\"%html_id%\""
-              %}
+              {% include vendor/anchor_headings.html html=content beforeHeading="true" anchorBody="<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><use xlink:href=\"#svg-link\"></use></svg>" anchorClass="anchor-heading" anchorAttrs="aria-labelledby=\"%html_id%\"" %}
             {% else %}
               {{ content }}
             {% endif %}
@@ -101,9 +78,11 @@ layout: table_wrappers
               {% include components/children_nav.html %}
             {% endif %}
           </main>
+
           {% include components/footer.html %}
         </div>
       </div>
+
       {% if site.search_enabled != false %}
         {% include components/search_footer.html %}
       {% endif %}
@@ -117,59 +96,29 @@ layout: table_wrappers
       (function () {
         const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        function applyTheme() {
-          const theme = darkModeQuery.matches ? 'dark' : 'light';
-          console.log('System prefers:', theme);
-
-          if (typeof jtd !== 'undefined' && typeof jtd.setTheme === 'function') {
-            console.log('Setting theme to:', theme);
-            jtd.setTheme(theme);
-          } else {
-            console.log('jtd.setTheme not available');
+        function syncTheme() {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          if (window.jtd && typeof window.jtd.setTheme === 'function') {
+            window.jtd.setTheme(currentTheme);
           }
         }
 
-        console.log('Page loaded, detecting theme...');
-        applyTheme();
-
-        darkModeQuery.addEventListener('change', function () {
-          console.log('System theme changed');
-          applyTheme();
-        });
-      })();
-    </script>
-
-    <script>
-      (function () {
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        let finalized = false;
-
-        function finalize() {
-          if (finalized) return;
-          finalized = true;
-
-          const currentTheme = darkModeQuery.matches ? 'dark' : 'light';
-          document.documentElement.setAttribute('data-theme', currentTheme);
-
-          requestAnimationFrame(() => {
-            document.documentElement.classList.remove('loading');
-            document.documentElement.classList.add('loaded');
-          });
+        function finalizePage() {
+          syncTheme();
+          document.documentElement.classList.replace('loading', 'loaded');
         }
 
         if (document.readyState === 'complete') {
-          finalize();
+          finalizePage();
         } else {
-          window.addEventListener('load', finalize);
-          setTimeout(finalize, 2500);
+          window.addEventListener('load', finalizePage);
+          setTimeout(finalizePage, 2500);
         }
 
-        darkModeQuery.addEventListener('change', function () {
-          const newTheme = darkModeQuery.matches ? 'dark' : 'light';
+        darkModeQuery.addEventListener('change', (e) => {
+          const newTheme = e.matches ? 'dark' : 'light';
           document.documentElement.setAttribute('data-theme', newTheme);
-          if (window.jtd && typeof window.jtd.setTheme === 'function') {
-            window.jtd.setTheme(newTheme);
-          }
+          syncTheme();
         });
       })();
     </script>
