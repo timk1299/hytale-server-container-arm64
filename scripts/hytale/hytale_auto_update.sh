@@ -20,7 +20,7 @@ extract_server() {
     # SAFE EXTRACTION: Only overwrites files from the archive
     # Files not in the archive (user data, configs, mods) remain untouched
 #    if 7z x "$zip_file" -aoa -bsp1 -mmt=on -o"$GAME_DIR"; then # >/dev/null 2>&1; then
-    if unzip "$zip_file" -d "$GAME_DIR"; then
+    if unzip -o "$zip_file" -d "$GAME_DIR" >/dev/null 2>&1; then
         log_success
         if [ "${DEBUG:-FALSE}" = "TRUE" ]; then
             printf "      ${DIM}↳ Note:${NC} Server binaries updated. User data preserved.\n"
@@ -32,7 +32,7 @@ extract_server() {
     
     log_step "Post-Extraction Cleanup"
     rm -f "$zip_file"
-    echo "$(basename "$zip_file")" > "$BASE_DIR"/latest_version_hytale.txt
+    echo "$(basename "$zip_file" .zip)" > "$BASE_DIR"/latest_version_hytale.txt
     log_success
     
     chown -R container:container "$BASE_DIR" 2>/dev/null || true
@@ -45,18 +45,24 @@ extract_server() {
 
 log_warning "Auto Update started." "Checking for new version online..."
 
-(cd "$TEMP_DIR" ; latest_version_online=$(FEX /usr/local/bin/hytale-downloader -print-version 2>/dev/null | tee /dev/tty | tail -1))
+# get the newest version string
+latest_version_online=$(FEX /usr/local/bin/hytale-downloader -print-version 2>/dev/null | tee /dev/tty | tail -1)
+if [ -f "$BASE_DIR"/latest_version_hytale.txt ]; then
+    installed_version=$(cat "$BASE_DIR"/latest_version_hytale.txt 2>/dev/null)
+else
+    installed_version=""
+fi
 
-if [ cat "$BASE_DIR"/latest_version_hytale.txt == latest_version_online]; then
+if [ "$installed_version" = "$latest_version_online" ]; then
     log_warning "Already newest version. No download needed."
     exit 0
 else
+    log_warning "New version detected. Downloading files..."
     log_step "Download Status"
-    lof_warning "New version detected. Downloading files..."
-    (cd "$BASE_DIR" ; FEX /usr/local/bin/hytale-downloader)
+    FEX /usr/local/bin/hytale-downloader
 fi
 
-ZIP_FILE=$(find "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
+ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
 if [ -z "$ZIP_FILE" ]; then
     log_error "Download failed." "Could not find valid YYYY.MM.DD*.zip after download."
     exit 1

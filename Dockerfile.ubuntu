@@ -126,24 +126,18 @@ RUN if getent passwd ${UID} > /dev/null 2>&1; then \
         useradd -m -d ${HOME} -u ${UID} -g ${USER} -s /bin/sh ${USER}; \
     fi
 
-# 4. Copy Prepared Files from Builder
-# Using --chown here is much more efficient than running 'chown -R' on a new layer
-COPY --from=builder --chown=root:root /build/hytale-downloader /usr/local/bin/hytale-downloader
-COPY --from=builder --chown=${USER}:${USER} /build/scripts/ /usr/local/bin/scripts/
-COPY --from=builder --chown=${USER}:${USER} /build/entrypoint.sh /entrypoint.sh
-
-# 5. Build Metadata
+# 4. Build Metadata
 ARG BUILDTIME=local
 ARG VERSION=local
 ARG REVISION=local
 RUN printf "buildtime=${BUILDTIME}\nversion=${VERSION}\nrevision=${REVISION}\n" > /etc/image.properties
 
-# 6. Install tini
+# 5. Install tini
 ARG TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-arm64 /tini
 RUN chmod +x /tini
 
-# 7. Set up rootfs
+# 6. Set up rootfs
 ################
 USER ${USER}
 WORKDIR /home/${USER}/.fex-emu/RootFS/
@@ -159,10 +153,18 @@ WORKDIR /home/${USER}/.fex-emu
 # GODEBUG=asyncpreemptoff=1 necessary for execution of golang-executable (hytale-downloader)
 RUN echo '{"Config":{"RootFS":"Ubuntu_24_04","Env": "GODEBUG=asyncpreemptoff=1"}}' > ./Config.json
 
+
+USER root
+WORKDIR /build
+# 7. Copy Prepared Files from Builder
+# Using --chown here is much more efficient than running 'chown -R' on a new layer
+COPY --from=builder --chown=root:root /build/hytale-downloader /usr/local/bin/hytale-downloader
+COPY --from=builder --chown=${USER}:${USER} /build/scripts/ /usr/local/bin/scripts/
+COPY --from=builder --chown=${USER}:${USER} /build/entrypoint.sh /entrypoint.sh
+
 # Final Config
-RUN mkdir ${HOME}/temp
-WORKDIR ${HOME}/hytale
 USER ${USER}
+WORKDIR ${HOME}/hytale
 EXPOSE ${SERVER_PORT}/udp
 STOPSIGNAL SIGTERM
 
