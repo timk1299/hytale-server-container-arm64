@@ -6,7 +6,15 @@
   <img alt="Docker Hytale Server Logo" src="https://github.com/deinfreu/hytale-server-container/blob/main/assets/images/logo_Light.png" width="800">
 </picture>
 
+<br>
+
 **This repository is based on https://github.com/deinfreu/hytale-server-container.git, but is executable on arm64.**
+<br>
+New feature:
+Option to automatically check for new game version online without manually removing old game files 
+(STARTUP_AUTO_UPDATE)
+
+<br>
 
 Deploy a Hytale dedicated server with a community-focused Docker image by 10+ contributors. This project simplifies Hytale self-hosting with built-in security, networking and debugging tools. Join our active Discord for direct support and to connect with other server owners. Whether you're testing mods or running a persistent world, this container provides a consistent, production-ready environment in one command.
 
@@ -31,6 +39,7 @@ docker run \
   -e PROD="FALSE" \
   -e DEBUG="FALSE" \
   -e TZ="Europe/Amsterdam" \
+  -e STARTUP_AUTO_UPDATE="FALSE" \
   -p 5520:5520/udp \
   -v "hytale-server:/home/container/hytale" \
   -v "/etc/machine-id:/etc/machine-id:ro" \
@@ -51,6 +60,7 @@ services:
       PROD: "FALSE"
       DEBUG: "FALSE"
       TZ: "Europe/Amsterdam"
+      STARTUP_AUTO_UPDATE: "FALSE"
     restart: unless-stopped
     ports:
       - "5520:5520/udp"
