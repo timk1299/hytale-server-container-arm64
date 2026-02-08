@@ -44,15 +44,12 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Optional: If you want ONLY the content to slide like we had before */
-/* Smooth page animations with view transitions */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.25s;
   animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Content area animations */
 #main-content {
   view-transition-name: main-content;
 }
@@ -62,30 +59,21 @@ html {
 }
 
 ::view-transition-new(main-content) {
+  opacity: 0;
+}
+
+html.loaded ::view-transition-new(main-content) {
   animation: 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms both fade-in;
 }
 
 @keyframes fade-out {
-  from { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-  to { 
-    opacity: 0; 
-    transform: translateY(6px);
-  }
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(6px); }
 }
 
 @keyframes fade-in {
-  from { 
-    opacity: 0; 
-    transform: translateY(-6px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @view-transition {
@@ -107,3 +95,5 @@ div.highlighter-rouge div.highlight {
 code {
   font-size: 1em;
 }
+
+@media (min-width: 31.25rem) { .site-title {font-size: 1.125rem !important;line-height: 1.25;} }
