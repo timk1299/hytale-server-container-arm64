@@ -10,9 +10,13 @@ log_step "Hytale Server Binary Check"
 # Check for existing update package first (manual download or update)
 ZIP_FILE=$(ls "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
 
+
 if [ -n "$ZIP_FILE" ]; then
     # Update available - run update script
     sh "$SCRIPTS_PATH/hytale/hytale_update.sh"
+elif [ "$STARTUP_AUTO_UPDATE" ]; then
+    # Auto Update enabled -run update checker script
+    sh "$SCRIPTS_PATH/hytale/hytale_auto_update.sh"
 elif [ ! -f "$SERVER_JAR_PATH" ]; then
     # No jar and no zip - run fresh download script
     sh "$SCRIPTS_PATH/hytale/hytale_download.sh"

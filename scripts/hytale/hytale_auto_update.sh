@@ -4,7 +4,7 @@ set -eu
 # Load dependencies
 . "$SCRIPTS_PATH/utils.sh"
 
-log_section "Hytale Initial Download"
+log_section "Hytale Auto Update"
 
 # Helper function to extract and finalize
 extract_server() {
@@ -32,6 +32,7 @@ extract_server() {
     
     log_step "Post-Extraction Cleanup"
     rm -f "$zip_file"
+    echo "$(basename "$zip_file")" > "$BASE_DIR"/latest_version_hytale.txt
     log_success
     
     chown -R container:container "$BASE_DIR" 2>/dev/null || true
@@ -40,11 +41,20 @@ extract_server() {
     chmod -R 755 "$GAME_DIR" && log_success || log_warning "Chmod failed" "May need manual adjustment."
 }
 
-# Main logic - fresh install
-log_warning "HytaleServer.jar not found." "Downloading fresh installation..."
+# Main logic - Auto Update
 
-log_step "Download Status"
-(cd "$BASE_DIR" ; FEX /usr/local/bin/hytale-downloader)
+log_warning "Auto Update started." "Checking for new version online..."
+
+(cd "$TEMP_DIR" ; latest_version_online=$(FEX /usr/local/bin/hytale-downloader -print-version 2>/dev/null | tee /dev/tty | tail -1))
+
+if [ cat "$BASE_DIR"/latest_version_hytale.txt == latest_version_online]; then
+    log_warning "Already newest version. No download needed."
+    exit 0
+else
+    log_step "Download Status"
+    lof_warning "New version detected. Downloading files..."
+    (cd "$BASE_DIR" ; FEX /usr/local/bin/hytale-downloader)
+fi
 
 ZIP_FILE=$(find "$BASE_DIR"/[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]*.zip 2>/dev/null | head -n 1)
 if [ -z "$ZIP_FILE" ]; then
