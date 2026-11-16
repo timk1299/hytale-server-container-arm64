@@ -24,71 +24,54 @@ RUN find scripts -type f -name "*.sh" -exec dos2unix {} + && \
     chmod -R +x scripts && \
     chmod +x entrypoint.sh
 
+# --- FEX stages ---
+# Shared download stage (runs on the build machine, no QEMU needed)
+FROM --platform=$BUILDPLATFORM ubuntu:26.04 AS fetch
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# FEX interpreter from the official FEX PPA.
+# All three CPU variants are installed to /opt/fex/<variant>/; fex-select.sh
+# (installed as /usr/bin/FEX) picks the right one when the container runs.
+# Only the interpreter and its server are needed; the package's GUI tools and
+# thunk libraries are left out. To update, change the version and all three
+# checksums (see https://ppa.launchpadcontent.net/fex-emu/fex/ubuntu/dists/resolute/main/binary-arm64/Packages.gz).
+FROM fetch AS fex
+ARG FEX_DEB_VERSION=2611.1-1~r
+ARG FEX_SHA256_ARMV8_0=ede3696d16ed6649ff219bd37b2cadbbb4849e19993854680f3e0d95d61d99b7
+ARG FEX_SHA256_ARMV8_2=8b67b6348f3f08d55aea116705dc8c527a634082b970cb170d04f561d76aa299
+ARG FEX_SHA256_ARMV8_4=e7a698edb9f6ccf8c5559b971d9fd2816cf46b89a5d04f170b189795a8f09cb5
+RUN set -eux; \
+    for entry in "armv8.0 ${FEX_SHA256_ARMV8_0}" "armv8.2 ${FEX_SHA256_ARMV8_2}" "armv8.4 ${FEX_SHA256_ARMV8_4}"; do \
+      variant="${entry%% *}"; sha256="${entry#* }"; package="fex-emu-${variant}"; \
+      curl -fsSL "https://ppa.launchpadcontent.net/fex-emu/fex/ubuntu/pool/main/f/${package}/${package}_${FEX_DEB_VERSION}_arm64.deb" -o /tmp/fex.deb; \
+      echo "${sha256}  /tmp/fex.deb" | sha256sum -c -; \
+      rm -rf /tmp/fex; \
+      dpkg-deb -x /tmp/fex.deb /tmp/fex; \
+      install -D -m 755 /tmp/fex/usr/bin/FEX "/out/opt/fex/${variant}/FEX"; \
+      install -D -m 755 /tmp/fex/usr/bin/FEXServer "/out/opt/fex/${variant}/FEXServer"; \
+    done; \
+    rm -rf /tmp/fex /tmp/fex.deb
+
+# Minimal x86 rootfs for hytale-downloader. The downloader is a statically
+# linked Go program, so it only needs CA certificates.
+FROM --platform=linux/amd64 ubuntu:26.04 AS rootfs-base
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* /usr/share/doc/* /usr/share/man/* /usr/share/info/*
+
+# FEX looks up files in the rootfs first and falls back to the host. Removing
+# these makes the downloader use the container's own DNS, hosts and user files.
+FROM fetch AS rootfs
+COPY --from=rootfs-base / /rootfs/
+RUN rm -f /rootfs/etc/resolv.conf /rootfs/etc/hosts /rootfs/etc/hostname \
+          /rootfs/etc/passwd /rootfs/etc/group /rootfs/etc/shadow /rootfs/etc/gshadow
+
 # --- STAGE 2: Final Runtime ---
 FROM eclipse-temurin:26-jdk
 
 ENV DEBIAN_FRONTEND=noninteractive
-
-### FEX ###
-# Install FEX dependencies
-RUN apt-get update && \
-    apt-get install -y \
-    git \
-    cmake \
-    ninja-build \
-    pkgconf \
-    ccache \
-    clang \
-    llvm \
-    lld \
-    binfmt-support \
-    libssl-dev \
-    python3-setuptools \
-    g++-x86-64-linux-gnu \
-    libgcc-12-dev-i386-cross \
-    libgcc-12-dev-amd64-cross \
-    nasm \
-    python3-clang \
-    libstdc++-12-dev-i386-cross \
-    libstdc++-12-dev-amd64-cross \
-    libstdc++-12-dev-arm64-cross \
-    squashfs-tools \
-    squashfuse \
-    libc-bin \
-    libc6-dev-i386-amd64-cross \
-    lib32stdc++-12-dev-amd64-cross \
-    expect \
-    curl \
-    sudo \
-    fuse \
-    qtdeclarative5-dev \
-    qtbase5-dev
-
-# Create a new user and set their home directory
-RUN useradd -m -s /bin/bash fex
-
-RUN usermod -aG sudo fex
-
-RUN echo "fex ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/fex
-
-USER fex
-
-WORKDIR /home/fex
-
-# Clone the FEX repository and build it
-RUN git clone --recurse-submodules https://github.com/timk1299/FEX.git --branch FEX-2607-docker && \
-    cd FEX && \
-    mkdir Build && \
-    cd Build && \
-    CC=clang CXX=clang++ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DUSE_LINKER=lld -DENABLE_LTO=True -DBUILD_TESTING=False -DENABLE_ASSERTIONS=False -G Ninja .. && \
-    ninja
-
-WORKDIR /home/fex/FEX/Build
-
-RUN sudo ninja install && \
-    sudo ninja binfmt_misc
-
-
 
 # Build arguments for customizable UID/GID
 ARG UID=1000
@@ -110,9 +93,15 @@ WORKDIR /build
 
 # 1. Install Runtime Dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    tini curl iproute2 ca-certificates tzdata jq unzip wget \
-    squashfs-tools &&\
+    tini curl iproute2 ca-certificates tzdata jq unzip wget &&\
     rm -rf /var/lib/apt/lists/*
+
+### FEX ###
+# FEX (all CPU variants), the selector and the x86 rootfs; see the FEX stages
+# above. The scripts start FEX explicitly, so no binfmt_misc is needed.
+COPY --from=fex /out/opt/fex/ /opt/fex/
+COPY --chmod=755 fex-select.sh /usr/bin/FEX
+COPY --from=rootfs /rootfs/ /opt/fex-rootfs/
 
 # 2. Add Gosu
 COPY --from=tianon/gosu:1.19 /gosu /usr/local/bin/
@@ -137,21 +126,13 @@ ARG TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-arm64 /tini
 RUN chmod +x /tini
 
-# 6. Set up rootfs
+# 6. FEX config
 ################
 USER ${USER}
-WORKDIR /home/${USER}/.fex-emu/RootFS/
-
-RUN wget -O Ubuntu_24_04.sqsh https://rootfs.fex-emu.gg/Ubuntu_24_04/2025-12-27/Ubuntu_24_04.sqsh
-
-RUN unsquashfs -f -d ./Ubuntu_24_04 Ubuntu_24_04.sqsh
-
-RUN rm ./Ubuntu_24_04.sqsh
-
 WORKDIR /home/${USER}/.fex-emu
 
 # GODEBUG=asyncpreemptoff=1 necessary for execution of golang-executable (hytale-downloader)
-RUN echo '{"Config":{"RootFS":"Ubuntu_24_04","Env": "GODEBUG=asyncpreemptoff=1"}}' > ./Config.json
+RUN echo '{"Config":{"RootFS":"/opt/fex-rootfs","Env": "GODEBUG=asyncpreemptoff=1"}}' > ./Config.json
 
 
 USER root
